@@ -14,17 +14,16 @@ from functools import wraps
 # Load model - Try optimized model first, fall back to original
 print("Loading model...")
 try:
-    model_file = 'model_optimized.bin'
+    model_file = 'student-dropout-ai-agent-clean/model_optimized.bin'
     with open(model_file, 'rb') as f_in:
         scaler, model_rf, model_name = pickle.load(f_in)
-    print(f"✓ Loaded optimized model: {model_name}")
     use_optimized = True
 except:
-    model_file = 'model_rf.bin'
+    model_file = 'student-dropout-ai-agent-clean/model_rf.bin'
     with open(model_file, 'rb') as f_in:
         scaler, model_rf = pickle.load(f_in)
-    print("✓ Loaded original model")
     use_optimized = False
+
 
 app = Flask(__name__, static_folder='static', static_url_path='/static')
 app.secret_key = 'your-secret-key-change-this-in-production'  # Change this in production!
