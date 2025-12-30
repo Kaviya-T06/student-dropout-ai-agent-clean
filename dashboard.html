@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Student Shield - AI-Powered Success Prediction</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;900&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#667eea",
+                        "primary-dark": "#5568d3",
+                        "accent": "#46C9C3",
+                        "background-light": "#F0F2F5",
+                        "background-dark": "#111421",
+                        "text-primary": "#333333",
+                        "text-primary-dark": "#E0E0E0",
+                        "risk-low": "#10b981",
+                        "risk-medium": "#f59e0b",
+                        "risk-high": "#ef4444",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+    <style type="text/tailwindcss">
+        body {
+            @apply font-display bg-background-light dark:bg-background-dark text-text-primary dark:text-text-primary-dark;
+        }
+        .form-input {
+            @apply flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg bg-white dark:bg-gray-800 text-text-primary dark:text-text-primary-dark focus:outline-none focus:ring-2 focus:ring-primary/50 border border-gray-300 dark:border-gray-700 h-12 placeholder:text-gray-400 dark:placeholder:text-gray-500 px-4 text-sm font-normal leading-normal transition-colors;
+        }
+        .card {
+            @apply bg-white dark:bg-gray-800/50 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50 p-6;
+        }
+        .rating-btn {
+            @apply w-10 h-10 rounded-lg border-2 border-primary text-primary font-bold text-lg hover:bg-primary hover:text-white transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-primary;
+        }
+        .value-badge {
+            @apply inline-flex items-center justify-center min-w-[3rem] px-3 py-1.5 bg-gradient-to-r from-primary to-primary-dark text-white font-bold rounded-lg shadow-md;
+        }
+        
+        @keyframes rainbow-pulse {
+            0% { color: #667eea; transform: scale(1); }
+            14% { color: #46C9C3; transform: scale(1.15); }
+            28% { color: #10b981; transform: scale(1); }
+            42% { color: #f59e0b; transform: scale(1.15); }
+            57% { color: #ef4444; transform: scale(1); }
+            71% { color: #ec4899; transform: scale(1.15); }
+            85% { color: #8b5cf6; transform: scale(1); }
+            100% { color: #667eea; transform: scale(1.15); }
+        }
+        
+        .magical-animation {
+            animation: rainbow-pulse 1.4s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+<div class="relative flex min-h-screen w-full flex-col font-display">
+    <!-- Header -->
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-gray-200 dark:border-gray-700 px-6 sm:px-10 lg:px-20 py-4 bg-white dark:bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50">
+        <div class="flex items-center gap-4 text-primary">
+            <div class="size-10 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center text-white text-2xl shadow-lg">
+                🛡️
+            </div>
+            <h2 class="text-primary text-xl font-bold leading-tight tracking-[-0.015em]">Student Shield</h2>
+        </div>
+        <div class="flex items-center gap-4">
+            <button onclick="logout()" class="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors">
+                <span class="material-symbols-outlined text-xl">logout</span>
+                <span class="text-sm font-medium">Logout</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 px-4 sm:px-6 lg:px-8 py-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- Stats Banner -->
+            <div class="card mb-8">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                    <div class="flex flex-col items-center gap-1">
+                        <span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Model Accuracy</span>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-xl text-primary">verified</span>
+                            <p class="text-lg font-bold text-text-primary dark:text-text-primary-dark">94.2%</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center gap-1">
+                        <span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Predictions Made</span>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-xl text-primary">psychology</span>
+                            <p class="text-lg font-bold text-text-primary dark:text-text-primary-dark" id="prediction-count">0</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center gap-1">
+                        <span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Success Rate</span>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-xl text-primary">trending_up</span>
+                            <p class="text-lg font-bold text-text-primary dark:text-text-primary-dark">87.5%</p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center gap-1">
+                        <span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wider">Analysis Time</span>
+                        <div class="flex items-center gap-2">
+                            <span class="material-symbols-outlined text-xl text-primary">speed</span>
+                            <p class="text-lg font-bold text-text-primary dark:text-text-primary-dark">&lt; 1s</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form and Results Grid -->
+            <form id="predictor-form" class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <!-- Left Column - Input Form -->
+                <div class="lg:col-span-3 flex flex-col gap-8">
+                    <h1 class="text-text-primary dark:text-text-primary-dark text-3xl font-black leading-tight tracking-[-0.033em]">Student Data Input</h1>
+                    
+                    <!-- Academic Performance Card -->
+                    <div class="card">
+                        <h2 class="text-text-primary dark:text-text-primary-dark text-lg font-bold leading-tight tracking-[-0.015em] mb-6 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">school</span>
+                            Academic Performance
+                        </h2>
+                        <div class="grid grid-cols-1 gap-6">
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">2nd Semester Enrolled Units</p>
+                                <input class="form-input" name="curricular_units_2nd_sem_(enrolled)" type="number" value="8" placeholder="8" min="0" max="20" required/>
+                            </label>
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">2nd Semester Approved Units</p>
+                                <input class="form-input" name="curricular_units_2nd_sem_(approved)" type="number" value="8" placeholder="8" min="0" max="20" required/>
+                            </label>
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">2nd Semester Grade</p>
+                                <input class="form-input" name="curricular_units_2nd_sem_(grade)" type="number" step="0.01" value="7.00" placeholder="7.00" min="0" max="10" required/>
+                            </label>
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">1st Semester Enrolled Units</p>
+                                <input class="form-input" name="curricular_units_1st_sem_(enrolled)" type="number" value="8" placeholder="8" min="0" max="20" required/>
+                            </label>
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">1st Semester Approved Units</p>
+                                <input class="form-input" name="curricular_units_1st_sem_(approved)" type="number" value="8" placeholder="8" min="0" max="20" required/>
+                            </label>
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">1st Semester Grade</p>
+                                <input class="form-input" name="curricular_units_1st_sem_(grade)" type="number" step="0.01" value="7.00" placeholder="7.00" min="0" max="10" required/>
+                            </label>
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">Attendance Percentage</p>
+                                <input class="form-input" name="attendance_percentage" type="number" value="85" placeholder="85" min="0" max="100" required/>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Overall attendance rate (0-100%)</p>
+                            </label>
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">Study Hours Per Week</p>
+                                <input class="form-input" name="study_hours_per_week" type="number" value="20" placeholder="20" min="0" max="168" required/>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Hours spent studying per week</p>
+                            </label>
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">Previous Failures</p>
+                                <input class="form-input" name="previous_failures" type="number" value="0" placeholder="0" min="0" max="10" required/>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Number of failed subjects in previous years</p>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Student Profile Card -->
+                    <div class="card">
+                        <h2 class="text-text-primary dark:text-text-primary-dark text-lg font-bold leading-tight tracking-[-0.015em] mb-6 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">person</span>
+                            Student Profile
+                        </h2>
+                        <div class="grid grid-cols-1 gap-6">
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">Age at Enrollment</p>
+                                <input class="form-input" name="age_at_enrollment" type="number" value="19" placeholder="19" min="16" max="100" required/>
+                            </label>
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">Gender</p>
+                                <select class="form-input" name="gender" required>
+                                    <option value="">Select gender</option>
+                                    <option value="0">Female</option>
+                                    <option value="1" selected>Male</option>
+                                </select>
+                            </label>
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">Application Mode</p>
+                                <select class="form-input" name="application_mode" required>
+                                    <option value="">Select admission pathway</option>
+                                    <option value="1" selected>General Merit (JEE/NEET/State Entrance)</option>
+                                    <option value="2">Management Quota</option>
+                                    <option value="3">NRI Quota</option>
+                                    <option value="4">Sports Quota</option>
+                                    <option value="5">SC/ST/OBC Reserved Category</option>
+                                    <option value="6">Lateral Entry (Diploma holders)</option>
+                                    <option value="7">CIWG/Defense Quota</option>
+                                    <option value="8">Foreign National/International Student</option>
+                                    <option value="9">TFWS (Tuition Fee Waiver Scheme)</option>
+                                    <option value="10">Counseling Round 2/Spot Admission</option>
+                                    <option value="11">Direct Admission (University Entrance)</option>
+                                    <option value="12">Inter-University Transfer</option>
+                                    <option value="13">EWS (Economically Weaker Section)</option>
+                                    <option value="14">Kashmiri Migrant Quota</option>
+                                    <option value="15">Branch Change/Course Transfer</option>
+                                    <option value="16">PwD (Person with Disability) Quota</option>
+                                    <option value="17">Supernumerary Seats</option>
+                                    <option value="18">Institution Migration</option>
+                                </select>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Admission category/pathway as per Indian education system</p>
+                            </label>
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">Displaced Student</p>
+                                <select class="form-input" name="displaced" required>
+                                    <option value="">Select status</option>
+                                    <option value="1" selected>Yes</option>
+                                    <option value="0">No</option>
+                                </select>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Lives away from family home to attend university</p>
+                            </label>
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">Marital Status</p>
+                                <select class="form-input" name="marital_status" required>
+                                    <option value="">Select marital status</option>
+                                    <option value="1" selected>Single</option>
+                                    <option value="2">Married</option>
+                                    <option value="3">Divorced</option>
+                                    <option value="4">Widowed</option>
+                                    <option value="5">Other</option>
+                                </select>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Family Background Card -->
+                    <div class="card">
+                        <h2 class="text-text-primary dark:text-text-primary-dark text-lg font-bold leading-tight tracking-[-0.015em] mb-6 flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">family_restroom</span>
+                            Family Background
+                        </h2>
+                        <div class="grid grid-cols-1 gap-6">
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">Parent's Education Level</p>
+                                <select class="form-input" name="parents_education" required>
+                                    <option value="">Select education level</option>
+                                    <option value="0">No education</option>
+                                    <option value="1">Primary education (4th grade)</option>
+                                    <option value="2">Primary education (5th-9th grade)</option>
+                                    <option value="3" selected>Secondary education</option>
+                                    <option value="4">Higher education (bachelor's degree)</option>
+                                    <option value="5">Higher education (master's or doctorate)</option>
+                                </select>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Highest education level of either parent</p>
+                            </label>
+                            <label class="flex flex-col">
+                                <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">Parent's Occupation</p>
+                                <select class="form-input" name="parents_occupation" required>
+                                    <option value="">Select occupation</option>
+                                    <option value="0">Unemployed</option>
+                                    <option value="1">Service/Sales</option>
+                                    <option value="2" selected>Technical/Specialized</option>
+                                    <option value="3">Professional/Managerial</option>
+                                    <option value="4">Other</option>
+                                </select>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Primary occupation of either parent</p>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Financial & Hobbies Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <!-- Financial Status -->
+                        <div class="card">
+                            <h2 class="text-text-primary dark:text-text-primary-dark text-lg font-bold leading-tight tracking-[-0.015em] mb-6 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">payments</span>
+                                Financial Status
+                            </h2>
+                            <div class="space-y-6">
+                                <label class="flex flex-col">
+                                    <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">Tuition Fees Up to Date</p>
+                                    <select class="form-input" name="tuition_fees_up_to_date" required>
+                                        <option value="">Select status</option>
+                                        <option value="1" selected>Yes</option>
+                                        <option value="0">No</option>
+                                    </select>
+                                </label>
+                                <label class="flex flex-col">
+                                    <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">Scholarship Holder</p>
+                                    <select class="form-input" name="scholarship_holder" required>
+                                        <option value="">Select status</option>
+                                        <option value="1">Yes</option>
+                                        <option value="0" selected>No</option>
+                                    </select>
+                                </label>
+                                <label class="flex flex-col">
+                                    <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">Debtor Status</p>
+                                    <select class="form-input" name="debtor" required>
+                                        <option value="">Select status</option>
+                                        <option value="0" selected>No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </label>
+                                <label class="flex flex-col">
+                                    <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium leading-normal pb-2">Family Income Level</p>
+                                    <select class="form-input" name="family_income_level" required>
+                                        <option value="">Select income level</option>
+                                        <option value="0">Very Low</option>
+                                        <option value="1">Low</option>
+                                        <option value="2" selected>Medium</option>
+                                        <option value="3">High</option>
+                                        <option value="4">Very High</option>
+                                    </select>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Household income classification</p>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Hobby & Interest Profile -->
+                        <div class="card">
+                            <h2 class="text-text-primary dark:text-text-primary-dark text-lg font-bold leading-tight tracking-[-0.015em] mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">sports_esports</span>
+                                Hobby & Interest Profile
+                            </h2>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mb-6">Rate student's engagement level (0=None, 1-2=Low, 3=Medium, 4-5=High)</p>
+                            <div class="space-y-4">
+                                <!-- Sports -->
+                                <div class="flex flex-col gap-2">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium">⚽ Sports</p>
+                                        <span class="value-badge" id="sports_val">3</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" class="rating-btn" onclick="decrementRating('sports')">−</button>
+                                        <div class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="h-full bg-gradient-to-r from-primary to-primary-dark transition-all" id="sports_bar" style="width: 60%"></div>
+                                        </div>
+                                        <button type="button" class="rating-btn" onclick="incrementRating('sports')">+</button>
+                                    </div>
+                                    <input type="hidden" name="hobbies_sports" id="h_sports" value="3">
+                                </div>
+
+                                <!-- Arts -->
+                                <div class="flex flex-col gap-2">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium">🎨 Arts</p>
+                                        <span class="value-badge" id="arts_val">3</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" class="rating-btn" onclick="decrementRating('arts')">−</button>
+                                        <div class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="h-full bg-gradient-to-r from-primary to-primary-dark transition-all" id="arts_bar" style="width: 60%"></div>
+                                        </div>
+                                        <button type="button" class="rating-btn" onclick="incrementRating('arts')">+</button>
+                                    </div>
+                                    <input type="hidden" name="hobbies_arts" id="h_arts" value="3">
+                                </div>
+
+                                <!-- Reading -->
+                                <div class="flex flex-col gap-2">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium">📖 Reading</p>
+                                        <span class="value-badge" id="reading_val">3</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" class="rating-btn" onclick="decrementRating('reading')">−</button>
+                                        <div class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="h-full bg-gradient-to-r from-primary to-primary-dark transition-all" id="reading_bar" style="width: 60%"></div>
+                                        </div>
+                                        <button type="button" class="rating-btn" onclick="incrementRating('reading')">+</button>
+                                    </div>
+                                    <input type="hidden" name="hobbies_reading" id="h_reading" value="3">
+                                </div>
+
+                                <!-- Social -->
+                                <div class="flex flex-col gap-2">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium">👥 Social</p>
+                                        <span class="value-badge" id="social_val">3</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" class="rating-btn" onclick="decrementRating('social')">−</button>
+                                        <div class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="h-full bg-gradient-to-r from-primary to-primary-dark transition-all" id="social_bar" style="width: 60%"></div>
+                                        </div>
+                                        <button type="button" class="rating-btn" onclick="incrementRating('social')">+</button>
+                                    </div>
+                                    <input type="hidden" name="hobbies_social" id="h_social" value="3">
+                                </div>
+
+                                <!-- Gaming -->
+                                <div class="flex flex-col gap-2">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium">🎮 Gaming</p>
+                                        <span class="value-badge" id="gaming_val">3</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" class="rating-btn" onclick="decrementRating('gaming')">−</button>
+                                        <div class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="h-full bg-gradient-to-r from-primary to-primary-dark transition-all" id="gaming_bar" style="width: 60%"></div>
+                                        </div>
+                                        <button type="button" class="rating-btn" onclick="incrementRating('gaming')">+</button>
+                                    </div>
+                                    <input type="hidden" name="hobbies_gaming" id="h_gaming" value="3">
+                                </div>
+
+                                <!-- Volunteering -->
+                                <div class="flex flex-col gap-2">
+                                    <div class="flex justify-between items-center">
+                                        <p class="text-text-primary dark:text-text-primary-dark text-sm font-medium">🤝 Volunteering</p>
+                                        <span class="value-badge" id="vol_val">3</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" class="rating-btn" onclick="decrementRating('vol')">−</button>
+                                        <div class="flex-1 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                            <div class="h-full bg-gradient-to-r from-primary to-primary-dark transition-all" id="vol_bar" style="width: 60%"></div>
+                                        </div>
+                                        <button type="button" class="rating-btn" onclick="incrementRating('vol')">+</button>
+                                    </div>
+                                    <input type="hidden" name="hobbies_volunteering" id="h_vol" value="3">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <button type="submit" id="predict-btn" class="w-full flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white text-base font-bold rounded-xl shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-0.5">
+                        <span class="material-symbols-outlined text-2xl">analytics</span>
+                        <span>Predict Success Probability</span>
+                    </button>
+                </div>
+
+                <!-- Right Column - Results -->
+                <div class="lg:col-span-2 flex flex-col gap-8">
+                    <h1 class="text-text-primary dark:text-text-primary-dark text-3xl font-black leading-tight tracking-[-0.033em]">Prediction Analysis</h1>
+                    
+                    <!-- Placeholder message when no prediction yet -->
+                    <div id="no-prediction" class="card flex flex-col items-center justify-center text-center p-12">
+                        <span class="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600 mb-4">analytics</span>
+                        <h3 class="text-xl font-bold text-gray-400 dark:text-gray-500 mb-2">No Prediction Yet</h3>
+                        <p class="text-sm text-gray-400 dark:text-gray-500">Fill in the student data and click "Predict Success Probability" to see the analysis</p>
+                    </div>
+                    
+                    <div id="result" class="flex flex-col gap-6" style="display: none; opacity: 0; transition: opacity 0.5s ease-in-out;">
+                        <!-- Download Report Button -->
+                        <div class="flex justify-end">
+                            <button onclick="downloadReport()" class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary to-primary-dark text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all hover:scale-105">
+                                <span class="material-symbols-outlined">download</span>
+                                <span>Download Report</span>
+                            </button>
+                        </div>
+
+                        <!-- Main Prediction Card -->
+                        <div class="card flex flex-col items-center justify-center text-center p-8">
+                            <div id="status-badge" class="flex items-center gap-3 text-risk-low bg-risk-low/10 rounded-full px-4 py-2">
+                                <span class="material-symbols-outlined">school</span>
+                                <p class="text-lg font-bold">Likely to Graduate</p>
+                            </div>
+                            <p id="main-probability" class="text-6xl font-black text-text-primary dark:text-text-primary-dark mt-4">0%</p>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">Confidence Score: <span id="confidence-display">0%</span></p>
+                        </div>
+
+                        <!-- Chart -->
+                        <div class="card">
+                            <h2 class="text-text-primary dark:text-text-primary-dark text-lg font-bold leading-tight tracking-[-0.015em] mb-4">Visual Analysis</h2>
+                            <div class="h-64">
+                                <canvas id="probChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Probability Distribution -->
+                        <div class="card">
+                            <h2 class="text-text-primary dark:text-text-primary-dark text-lg font-bold leading-tight tracking-[-0.015em] mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">bar_chart</span>
+                                Probability Distribution
+                            </h2>
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-4">
+                                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400 w-20">Graduate</span>
+                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                        <div id="graduate-bar" class="bg-risk-low h-2.5 rounded-full transition-all" style="width: 0%"></div>
+                                    </div>
+                                    <span id="graduate-prob" class="text-sm font-bold text-text-primary dark:text-text-primary-dark min-w-[3rem] text-right">0%</span>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400 w-20">Enrolled</span>
+                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                        <div id="enrolled-bar" class="bg-risk-medium h-2.5 rounded-full transition-all" style="width: 0%"></div>
+                                    </div>
+                                    <span id="enrolled-prob" class="text-sm font-bold text-text-primary dark:text-text-primary-dark min-w-[3rem] text-right">0%</span>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <span class="text-sm font-medium text-gray-500 dark:text-gray-400 w-20">Dropout</span>
+                                    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                                        <div id="dropout-bar" class="bg-risk-high h-2.5 rounded-full transition-all" style="width: 0%"></div>
+                                    </div>
+                                    <span id="dropout-prob" class="text-sm font-bold text-text-primary dark:text-text-primary-dark min-w-[3rem] text-right">0%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats Cards -->
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="card flex flex-col items-center justify-center text-center p-6">
+                                <h3 class="text-base font-bold text-text-primary dark:text-text-primary-dark mb-2">Success Rate</h3>
+                                <p id="success-rate" class="text-4xl font-black text-primary">0%</p>
+                            </div>
+                            <div class="card flex flex-col items-center justify-center text-center p-6">
+                                <h3 class="text-base font-bold text-text-primary dark:text-text-primary-dark mb-2">Risk Level</h3>
+                                <div id="risk-badge" class="inline-flex items-center justify-center gap-2 rounded-full bg-risk-low/10 px-4 py-1.5 text-sm font-bold text-risk-low">
+                                    <span class="material-symbols-outlined text-base">check_circle</span>
+                                    <span>Low</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Key Factors -->
+                        <div class="card">
+                            <h2 class="text-text-primary dark:text-text-primary-dark text-lg font-bold leading-tight tracking-[-0.015em] mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">analytics</span>
+                                Key Factors Influencing Prediction
+                            </h2>
+                            <div id="factor-list" class="space-y-6">
+                                <p class="text-sm text-gray-500 dark:text-gray-400" id="factors-placeholder">Run a prediction to see the most influential factors.</p>
+                            </div>
+                        </div>
+
+                        <!-- Teacher Recommendations -->
+                        <div class="card">
+                            <h2 class="text-text-primary dark:text-text-primary-dark text-lg font-bold leading-tight tracking-[-0.015em] mb-4 flex items-center gap-2">
+                                <span class="material-symbols-outlined text-primary">support_agent</span>
+                                Recommendations for Teachers
+                            </h2>
+                            <ul id="recommendation-list" class="space-y-4 list-none pl-0">
+                                <li id="recommendations-placeholder" class="text-sm text-gray-500 dark:text-gray-400">Insights and guidance will appear here after generating a prediction.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Quick Stats Grid -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="card p-4 text-center">
+                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">Attendance</p>
+                                <p id="quick-attendance" class="text-lg font-bold text-text-primary dark:text-text-primary-dark">--</p>
+                            </div>
+                            <div class="card p-4 text-center">
+                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">Study Hours/Week</p>
+                                <p id="quick-study-hours" class="text-lg font-bold text-text-primary dark:text-text-primary-dark">--</p>
+                            </div>
+                            <div class="card p-4 text-center">
+                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">Avg Grade</p>
+                                <p id="quick-avg-grade" class="text-lg font-bold text-text-primary dark:text-text-primary-dark">--</p>
+                            </div>
+                            <div class="card p-4 text-center">
+                                <p class="text-xs font-semibold text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">Failures</p>
+                                <p id="quick-failures" class="text-lg font-bold text-text-primary dark:text-text-primary-dark">--</p>
+                            </div>
+                        </div>
+
+                        <!-- Motivation Section -->
+                        <div>
+                            <h2 class="text-text-primary dark:text-text-primary-dark text-sm font-bold leading-tight tracking-[-0.015em] mb-3 uppercase tracking-wide">Motivation</h2>
+                            <div class="card p-4 text-center">
+                                <p id="motivation-quote" class="text-sm font-medium text-text-primary dark:text-text-primary-dark italic">
+                                    Small progress each day adds up to big results.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Did You Know? Fact Box -->
+                        <div class="card p-4 text-center">
+                            <p class="text-xs font-semibold text-primary mb-2 uppercase tracking-wide">Did You Know?</p>
+                            <p id="did-you-know-fact" class="text-sm text-text-primary dark:text-text-primary-dark">
+                                Consistent study routines are linked with higher graduation rates.
+                            </p>
+                        </div>
+
+                        <!-- Action Items Box -->
+                        <div class="card p-4">
+                            <p class="text-xs font-semibold text-primary mb-3 uppercase tracking-wide flex items-center gap-2">
+                                <span class="material-symbols-outlined text-base">lightbulb</span>
+                                Quick Action Items
+                            </p>
+                            <ul id="action-items-list" class="space-y-2 text-sm text-text-primary dark:text-text-primary-dark">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-primary mt-0.5">•</span>
+                                    <span>Review attendance records regularly</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-primary mt-0.5">•</span>
+                                    <span>Monitor study hours weekly</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-primary mt-0.5">•</span>
+                                    <span>Check academic performance monthly</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- Timestamp -->
+                        <div class="text-sm text-gray-500 dark:text-gray-400 text-center">
+                            Last updated: <span id="timestamp">--</span>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+
+<script src="/static/app-dashboard.js?v=3.0"></script>
+</body>
+</html>
